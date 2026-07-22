@@ -1,0 +1,10 @@
+{
+	"name": "@whop/elements-react",
+	"version": "0.0.0",
+	"description": "Whop Elements — React components. Declarative wrappers around the embedded element SDK.",
+	"license": "MIT",
+	"publishConfig": {
+		"access": "public",
+		"tag": "stub"
+	}
+}

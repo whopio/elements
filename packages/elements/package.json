@@ -1,0 +1,10 @@
+{
+	"name": "@whop/elements",
+	"version": "0.0.0",
+	"description": "Whop Elements — vanilla-js loader + types. Loads the hosted SDK and exposes the typed WhopElements factory.",
+	"license": "MIT",
+	"publishConfig": {
+		"access": "public",
+		"tag": "stub"
+	}
+}
