@@ -1,10 +1,19 @@
 {
-	"name": "@whop/elements",
-	"version": "0.0.0",
-	"description": "Whop Elements — vanilla-js loader + types. Loads the hosted SDK and exposes the typed WhopElements factory.",
-	"license": "MIT",
-	"publishConfig": {
-		"access": "public",
-		"tag": "stub"
-	}
+  "name": "@whop/elements",
+  "version": "1.0.0-beta.0",
+  "description": "Whop Elements — vanilla-js loader + types. Loads the hosted SDK and exposes the typed WhopElements factory.",
+  "keywords": [
+    "checkout",
+    "elements",
+    "embed",
+    "payments",
+    "whop"
+  ],
+  "homepage": "https://docs.whop.com/elements/latest",
+  "bugs": "https://github.com/whopio/elements/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/whopio/elements.git"
+  }
 }

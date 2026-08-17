@@ -1,10 +1,20 @@
 {
-	"name": "@whop/elements-react",
-	"version": "0.0.0",
-	"description": "Whop Elements — React components. Declarative wrappers around the embedded element SDK.",
-	"license": "MIT",
-	"publishConfig": {
-		"access": "public",
-		"tag": "stub"
-	}
+  "name": "@whop/elements-react",
+  "version": "1.0.0-beta.0",
+  "description": "Whop Elements — React components. Declarative wrappers around the embedded element SDK.",
+  "keywords": [
+    "checkout",
+    "elements",
+    "embed",
+    "payments",
+    "react",
+    "whop"
+  ],
+  "homepage": "https://docs.whop.com/elements/latest",
+  "bugs": "https://github.com/whopio/elements/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/whopio/elements.git"
+  }
 }
