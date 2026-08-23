@@ -157,7 +157,8 @@ export function createNamespaceReact(
         handleCallbacks,
         root,
         (options, live) => (root ? root[namespace]!.create({ ...options, ...live }) : null),
-        (s) => s.teardown?.(),
+        // an older hosted elements.js predates destroy() and carries only teardown().
+        (s) => (s.destroy ? s.destroy() : s.teardown?.()),
       );
       useImperativeHandle(ref, () => ({ handle: nsHandle }), [nsHandle]);
 
@@ -312,8 +313,12 @@ function makeElementComponent(
           setReady(true);
           (latest.current.onReady as (() => void) | undefined)?.();
         },
-        onError: (e: { message: string }) =>
-          (latest.current.onError as ((e: { message: string }) => void) | undefined)?.(e),
+        // a TERMINAL error settles the ready state too: the frame is showing its `.error()`
+        // face, and a `fallback` that keeps hiding the iframe would bury it forever.
+        onError: (e: { message: string; code?: string }) => {
+          setReady(true);
+          (latest.current.onError as ((e: { message: string; code?: string }) => void) | undefined)?.(e);
+        },
       });
     });
 

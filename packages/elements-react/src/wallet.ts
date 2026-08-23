@@ -28,10 +28,11 @@ const __ns = createNamespaceReact(
         'onRenameMethodRequested',
         'onRemoveMethodRequested',
         'onWithdrawalRequested',
+        'onDone',
       ],
     },
     { key: 'send', events: ['onStepChanged', 'onSendCompleted', 'onLinkCreated', 'onDone'] },
-    { key: 'cards', events: ['onCardSelected', 'onViewAllSelected', 'onAddCardRequested'] },
+    { key: 'cards', events: ['onCardSelected', 'onViewAllSelected', 'onAddCardRequested', 'onVerificationRequested'] },
   ],
   [],
   [

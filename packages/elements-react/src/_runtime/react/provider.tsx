@@ -41,6 +41,9 @@ export type WhopHandle = Record<string, unknown> & {
   /** seal the grouped loading when no element mounted eagerly. Optional: the react glue and
    *  the hosted runtime version independently, and an older elements.js predates the seal. */
   sealLoadingIfEmpty?(): void;
+  /** the consumer teardown verb. Optional for the same versioning reason — an older
+   *  elements.js predates it and carries only `teardown`; the unmount path falls back. */
+  destroy?(): void;
   teardown?(): void;
 };
 /** A namespace on the resolved instance: `create(opts)` boots a handle, plus each of the

@@ -8,12 +8,13 @@ export {
   CardElement,
   EmailElement,
   TaxIdElement,
+  BrandingElement,
   CardFields,
   CardNumberElement,
   CardExpiryElement,
   CardCvcElement,
 } from './payments.js';
-export { Checkout, useCheckout, CheckoutElement } from './checkout.js';
+export { Checkout, useCheckout, CheckoutElement, ExpressCheckoutElement } from './checkout.js';
 export {
   Ads,
   useAds,

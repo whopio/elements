@@ -7,6 +7,7 @@ const __ns = createNamespaceReact(
     { key: 'card', events: ['onChange'] },
     { key: 'email', events: ['onChange'] },
     { key: 'taxId', events: ['onChange'] },
+    { key: 'branding', events: [] },
   ],
   [],
   [
@@ -28,6 +29,7 @@ export const AddressElement = __ns.components['address'];
 export const CardElement = __ns.components['card'];
 export const EmailElement = __ns.components['email'];
 export const TaxIdElement = __ns.components['taxId'];
+export const BrandingElement = __ns.components['branding'];
 export const CardFields = __ns.subs['cardFields'].Provider;
 export const CardNumberElement = __ns.subs['cardFields'].components['cardNumber'];
 export const CardExpiryElement = __ns.subs['cardFields'].components['cardExpiry'];
