@@ -3,6 +3,7 @@ const __ns = createNamespaceReact(
   'wallet',
   [
     { key: 'activity', events: ['onActivitySelected', 'onActivityHovered', 'onDateRangeChanged'] },
+    { key: 'actions', events: ['onDepositRequested', 'onAcceptRequested', 'onSendRequested'] },
     {
       key: 'deposit',
       events: [
@@ -49,6 +50,7 @@ const __ns = createNamespaceReact(
 export const Wallet = __ns.HandleProvider;
 export const useWallet = __ns.useHandle;
 export const ActivityElement = __ns.components['activity'];
+export const ActionsElement = __ns.components['actions'];
 export const DepositElement = __ns.components['deposit'];
 export const WithdrawElement = __ns.components['withdraw'];
 export const SendElement = __ns.components['send'];

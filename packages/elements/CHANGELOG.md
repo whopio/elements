@@ -1,5 +1,25 @@
 # @whop/elements
 
+## 1.0.0-beta.2
+
+### Minor Changes
+
+- 24409ad: The payment element now offers card installment plans inside the card pane: buyers pick an installment count or pay in full, per-installment amounts are shown fee-adjusted, and eligibility follows the entered card. The card elements' `change` event now reports the detected `funding` type. ([#25279](https://github.com/whopio/whop-monorepo/pull/25279))
+- 24409ad: Added an embeddable wallet action row whose Deposit and Send controls open their built-in flows and whose Accept control opens the corresponding Whop setup. ([#25279](https://github.com/whopio/whop-monorepo/pull/25279))
+- 24409ad: The payment element offers a buyer's Whop balances as their own payment method instead of mixing them into the saved payment methods. Selecting it opens a scrollable list of the buyer's wallets — each with its account name, logo, and available amount in the checkout currency — that pages in as the buyer scrolls, automatically lands on a wallet that can cover the charge, and keeps the buyer's own pick through sign-ins and session changes. Compact checkouts offer a balance only when one can actually cover the charge. The new tile ships with its own styling hooks (PaymentBalanceList, PaymentBalance, PaymentBalanceRow, PaymentBalanceRowSelected, PaymentBalanceHint, PaymentBalanceMore). ([#25279](https://github.com/whopio/whop-monorepo/pull/25279))
+- element "branding" is no longer required (`payments.branding.required`)
+- element "actions" added (`wallet.actions`)
+
+### Patch Changes
+
+- 24409ad: Fixed the withdrawal method picker on mobile so payout options stay accessible in a nested sheet. ([#25279](https://github.com/whopio/whop-monorepo/pull/25279))
+- 24409ad: Keep existing payments integrations working when they do not yet mount the branding element, while still refusing explicitly mounted branding that is hidden. ([#25279](https://github.com/whopio/whop-monorepo/pull/25279))
+- 24409ad: The wallet balance chart keeps its line and end-dot inside the chart box, so a spike no longer sits on the 1D/1W/1M/1Y/ALL range pills. Those pills are optically centered, and the cards list uses the same 24px corner and padding as the balances list. ([#25279](https://github.com/whopio/whop-monorepo/pull/25279))
+- 24409ad: Bank wire payment instructions now show the receiving bank's routing number and address alongside its name and account number, so buyers have the full details needed to complete a transfer. ([#25279](https://github.com/whopio/whop-monorepo/pull/25279))
+- 24409ad: The deposit and withdraw amount fields no longer stop accepting digits partway through a large amount. Both rejected anything above 9,999,999, which is a rule about US dollars: an account holding a balance of COP 12,430,560 could not type its own balance, and neither could it reach it with MAX. The ceiling is now a limit on how many digits an amount may have rather than on how much it is worth. In withdraw, what a payer may actually move is still bounded by the available balance and the payout method's limits, which say so in words instead of silently swallowing a keystroke; deposit has no such balance to check against, so its amount is bounded server-side when the charge is made.
+  
+  The fields also accept a third decimal place for the currencies that have one, such as BHD, and never fewer than two for any currency. Long amounts shrink to stay on screen rather than running past the edge of the sheet. ([#25279](https://github.com/whopio/whop-monorepo/pull/25279))
+
 ## 1.0.0-beta.1
 
 ### Major Changes

@@ -29,6 +29,7 @@ export {
   Wallet,
   useWallet,
   ActivityElement,
+  ActionsElement,
   DepositElement,
   WithdrawElement,
   SendElement,
