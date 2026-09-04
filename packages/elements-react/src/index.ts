@@ -14,6 +14,7 @@ export {
   CardExpiryElement,
   CardCvcElement,
 } from './payments.js';
+export { Verifications, useVerifications, KycElement, CapabilitiesElement, RfiElement } from './verifications.js';
 export { Checkout, useCheckout, CheckoutElement, ExpressCheckoutElement } from './checkout.js';
 export {
   Ads,
@@ -24,18 +25,30 @@ export {
   ChartElement,
   TableElement,
 } from './ads.js';
-export { Tracking, useTracking, PeopleElement, EventsElement } from './tracking.js';
+export { Tracking, useTracking, PeopleElement, EventsElement, PersonElement } from './tracking.js';
 export {
   Wallet,
   useWallet,
-  ActivityElement,
+  RequiredActionsElement,
   ActionsElement,
+  ActivityElement,
+  ActivityDetailElement,
   DepositElement,
+  ConvertElement,
   WithdrawElement,
   SendElement,
-  CardsElement,
+  CardDetailsElement,
+  VerificationElement,
   Balances,
   BalanceElement,
+  BreakdownElement,
+  SettlementElement,
   ListElement,
+  Cards,
+  CardsElement,
+  CardsTableElement,
+  CardsChartElement,
+  WhopCardElement,
+  CardTransactionsElement,
 } from './wallet.js';
 export { Websites, useWebsites, WebsitesElement, PixelSetupElement } from './websites.js';

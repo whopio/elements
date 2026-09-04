@@ -1,6 +1,6 @@
 {
   "name": "@whop/elements",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "description": "Whop Elements — vanilla-js loader + types. Loads the hosted SDK and exposes the typed WhopElements factory.",
   "keywords": [
     "checkout",
