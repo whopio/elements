@@ -72,6 +72,14 @@ const __ns = createNamespaceReact(
       ],
     },
     {
+      key: 'reports',
+      events: [],
+      children: [
+        { key: 'balanceReport', events: ['onActivityRequested', 'onPaymentsRequested', 'onExportReady'] },
+        { key: 'reportActivity', events: ['onExportReady'] },
+      ],
+    },
+    {
       key: 'cards',
       events: [],
       children: [
@@ -104,6 +112,9 @@ export const BalanceElement = __ns.subs['balances'].components['balance'];
 export const BreakdownElement = __ns.subs['balances'].components['breakdown'];
 export const SettlementElement = __ns.subs['balances'].components['settlement'];
 export const ListElement = __ns.subs['balances'].components['list'];
+export const Reports = __ns.subs['reports'].Provider;
+export const BalanceReportElement = __ns.subs['reports'].components['balanceReport'];
+export const ReportActivityElement = __ns.subs['reports'].components['reportActivity'];
 export const Cards = __ns.subs['cards'].Provider;
 export const CardsElement = __ns.subs['cards'].components['cards'];
 export const CardsTableElement = __ns.subs['cards'].components['cardsTable'];

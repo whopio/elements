@@ -26,6 +26,10 @@ export interface GlobalConfig {
   toasts?: boolean;
   /** Override the origin serving the hosted element pages (local/staging). */
   baseUrl?: string;
+  /** Skip linking element analytics to the Whop pixel's visitor id on pages that run the
+   *  pixel — forwarded to the constructor. Usage analytics themselves are unaffected.
+   *  Load-time, like environment/baseUrl. @default false */
+  skipPixel?: boolean;
 }
 
 /** A handle instance — the imperative surface installed by the host runtime. */
@@ -127,20 +131,21 @@ export function WhopElements({
   environment,
   toasts,
   baseUrl,
+  skipPixel,
 }: { children: ReactNode; elements: ElementsProp } & GlobalConfig): ReactNode {
   // new store per `elements` identity; resolves the (possibly async) constructor or its failure.
   const store = useMemo(() => new LoaderStore(elements), [elements]);
   const { ctor, error } = useSyncExternalStore(store.subscribe, store.getSnapshot, () => PENDING);
 
   // the root carries environment/baseUrl (load-time origin selection — "cannot change after
-  // load") and toasts (the toast host registers at construction, first-root-wins — a later
-  // flip cannot take effect by design), so it's recreated only when those change;
-  // appearance/locale are live and reach handles via the config below (create + update),
-  // not a new root.
+  // load"), toasts (the toast host registers at construction, first-root-wins — a later
+  // flip cannot take effect by design), and skipPixel (the wuid link runs once at load), so
+  // it's recreated only when those change; appearance/locale are live and reach handles via
+  // the config below (create + update), not a new root.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const root = useMemo(
-    () => (ctor ? ctor({ appearance, locale, environment, toasts, baseUrl }) : null),
-    [ctor, environment, toasts, baseUrl],
+    () => (ctor ? ctor({ appearance, locale, environment, toasts, baseUrl, skipPixel }) : null),
+    [ctor, environment, toasts, baseUrl, skipPixel],
   );
 
   const config = useMemo<GlobalConfig>(

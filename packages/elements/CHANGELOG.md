@@ -1,5 +1,46 @@
 # @whop/elements
 
+## 1.0.0-beta.4
+
+### Minor Changes
+
+- ce38703: Added Bitcoin deposits to the Deposit element, with a reusable BTC address and direct settlement as USDT0 on Plasma. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: The deposit element can now preview a fee under the rail picker. Pass `depositRailFees` keyed by rail (`bank`, `crypto`) and the element shows the rate before an amount is entered and the charged amount after — the percentage in the deposit currency, the fixed part in USD. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: Added a compact layout option to the wallet verification banner. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: If your page also runs the Whop pixel, elements now connect their analytics visitor id to the pixel's visitor id — one identity link that makes element activity joinable to your ad-attribution data in Whop's identity graph. The connection is a single call made through the pixel's own SDK, at most once per page view — repeats are deduplicated on Whop's side, elements read and store nothing on your page for it, and the element frames themselves are never involved. Skip it entirely with `WhopElements({ skipPixel: true })` (also available on the React `<WhopElements>` provider). Pages without the pixel are unaffected: no link, no extra requests. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: Cashback can be selected in the Activity type filter under Cards. It remains excluded from the default activity feed. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: Payments can mount in setup mode. Pass `mode: "setup"` with a currency to save a buyer's payment method without charging them: the method list offers only methods that can be saved and amount limits do not apply. Confirm as usual and create the setup intent from your server. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: Embed balance reports and filtered report activity, including CSV exports, with wallet.reports. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: Embed a payments table with status counts, filters, CSV export, and payment selection events using PaymentsElement under Payments. Set `showActions={false}` to hide its header action menu, Export, and table settings. Set `showRowActions={false}` to hide row menus and `showStatusTabs={false}` to hide the status boxes. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- prop analytics allowlist: accountId,amount,currency,plan,setupFutureUsage → accountId,amount,currency,mode,plan,setupFutureUsage (`payments.controller.propAnalytics`)
+- element "payments" added (`payments.payments`)
+- prop analytics allowlist: accountId,amount,autoSelect,checkoutSessionId,currency,layout,plan,separated,setupFutureUsage → accountId,amount,autoSelect,checkoutSessionId,currency,layout,mode,plan,separated,setupFutureUsage (`payments.payment.propAnalytics`)
+- resource option "requestPayerPhone" added (`payments.paymentRequest.options.requestPayerPhone`)
+- prop analytics allowlist: brandingPreview,collectTaxId,ctaLabel,displayCurrency,nextActionType,paymentMethodRequired,promoCode,resultStatus,setupFutureUsage,showPromoInput,status,taxBehavior → brandingPreview,collectTaxId,ctaLabel,displayCurrency,mode,nextActionType,paymentMethodRequired,promoCode,resultStatus,setupFutureUsage,showPromoInput,status,taxBehavior (`checkout.checkout.propAnalytics`)
+- prop analytics allowlist: brandingPreview,ctaLabel,layout,paymentMethodRequired,promoCode,resultStatus,setupFutureUsage,showPromoInput,status → brandingPreview,ctaLabel,layout,mode,paymentMethodRequired,promoCode,resultStatus,setupFutureUsage,showPromoInput,status (`checkout.expressCheckout.propAnalytics`)
+- prop "depositRailFees" added (`wallet.deposit.props.depositRailFees`)
+- prop "compact" added (`wallet.verification.props.compact`)
+- sub-controller "reports" added (`wallet.reports`)
+
+### Patch Changes
+
+- ce38703: Address fields now reject card numbers with a field error and prevent those values from being submitted or sent to address autocomplete. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: When automatic withdrawals are on, undated pending funds say "Automatic withdrawal" instead of "Awaiting settlement". ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: Match activity-detail drawer content to the dashboard and improve wallet action and activity loading skeletons. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: Payment completion dialogs automatically show the account name from the payment, so buyers can see who they are paying. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: Clarify crypto deposits with a 0.3% deposit fee, a Bitcoin processing estimate of 10–30 minutes with confirmations on a separate line, and no receive row. Improve spacing and alignment on narrow screens. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: The deposit amount picker now shows bank transfer and crypto together while deposit details are still loading. Continue stays disabled with a spinner until the rails resolve, instead of revealing crypto only after the request finishes. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: Render declared loading skeletons before fixed-width modal-only elements initialize. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: Withdrawal details for an Interac e-Transfer now show the security answer, so the recipient can look it up when the transfer arrives instead of only seeing it once at the moment they withdraw. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: Fixed personal cash balances to show matching totals in the original currency and USD, including pending and reserved funds. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: Show platform fees and fee credits in the default wallet activity feed and activity type filters, including the account that paid or received the fee. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: Verification RFIs now show the payouts reviewer's full instructions beside the uploads they describe, instead of cutting them off, and number the uploads when a review asks for more than one document. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: Show the originating action on platform fee activity rows and in the Activity Detail Element. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: Cashback activity now uses a green gift icon, matching airdrops. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: Wallet sheets inside the embedded checkout and express-checkout elements now judge the page framing them instead of the element frame: Apple Pay validates the top-level page, and Google Pay can run on a merchant domain verified as a payment method domain through Whop's registration once enabled for the account. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: Show the parent account's configured fee before confirming an internal transfer or crypto conversion. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+- ce38703: Bank transfer instructions show the receiving bank's code on its own copyable row, under the name its own rail gives it, instead of appending it to the bank name. US bank wires now carry the receiving bank's SWIFT/BIC for buyers sending from abroad. ([#29416](https://github.com/whopio/whop-monorepo/pull/29416))
+
 ## 1.0.0-beta.3
 
 ### Major Changes

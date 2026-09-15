@@ -3,6 +3,7 @@ export { WHOP_ELEMENTS_LOCALES } from '@whop/elements';
 export {
   Payments,
   usePayments,
+  PaymentsElement,
   PaymentElement,
   AddressElement,
   CardElement,
@@ -44,6 +45,9 @@ export {
   BreakdownElement,
   SettlementElement,
   ListElement,
+  Reports,
+  BalanceReportElement,
+  ReportActivityElement,
   Cards,
   CardsElement,
   CardsTableElement,

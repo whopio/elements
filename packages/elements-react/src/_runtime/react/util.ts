@@ -7,6 +7,7 @@
 
 import { useEffect, useRef } from 'react';
 
+import { EVENT_HANDLERS_PROP, HANDLER_PRESENT } from '../builder/event-handlers.js';
 import { isCallbackName } from '../builder/naming.js';
 import { shallowEqual } from '../builder/shallow-equal.js';
 
@@ -18,12 +19,17 @@ import { shallowEqual } from '../builder/shallow-equal.js';
  * stop even after the consumer passes a real callback again (the wrappers install only at
  * create). The builder bans authored `on[A-Z]` data props, so nothing legitimate is lost.
  */
-function dataOptions(props: Record<string, unknown>): Record<string, unknown> {
+function dataOptions(props: Record<string, unknown>, callbackKeys?: string[]): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(props)) {
     if (isCallbackName(k)) continue;
     out[k] = v;
   }
+  if (callbackKeys)
+    out[EVENT_HANDLERS_PROP] = callbackKeys
+      .filter((key) => typeof props[key] === 'function')
+      .sort()
+      .join(',');
   return out;
 }
 
@@ -43,6 +49,7 @@ function liveCallbacks(
       const fn = latest.current[k];
       if (typeof fn === 'function') (fn as (...a: unknown[]) => void)(...args);
     };
+    Object.defineProperty(out[k], HANDLER_PRESENT, { get: () => typeof latest.current[k] === 'function' });
   }
   return out;
 }
@@ -66,6 +73,7 @@ export function useLiveHandle<T extends { update(options: Record<string, unknown
     latest: { current: Record<string, unknown> },
   ) => T | null,
   destroy?: (handle: T) => void,
+  trackEventHandlers = false,
 ): T | null {
   const latest = useRef<Record<string, unknown>>(props);
   latest.current = props;
@@ -77,14 +85,21 @@ export function useLiveHandle<T extends { update(options: Record<string, unknown
   // guard. The ref guard runs `create` exactly once per `dep`.
   const cache = useRef<{ dep: unknown; handle: T | null } | null>(null);
   if (cache.current === null || cache.current.dep !== dep) {
-    cache.current = { dep, handle: create(dataOptions(latest.current), liveCallbacks(callbackKeys, latest), latest) };
+    cache.current = {
+      dep,
+      handle: create(
+        dataOptions(latest.current, trackEventHandlers ? callbackKeys : undefined),
+        liveCallbacks(callbackKeys, latest),
+        latest,
+      ),
+    };
   }
   const handle = cache.current.handle;
 
   const prev = useRef<Record<string, unknown> | null>(null);
   useEffect(() => {
     if (!handle) return;
-    const options = dataOptions(latest.current);
+    const options = dataOptions(latest.current, trackEventHandlers ? callbackKeys : undefined);
     if (prev.current && shallowEqual(prev.current, options)) return;
     prev.current = options;
     handle.update(options);

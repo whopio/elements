@@ -304,23 +304,30 @@ function makeElementComponent(
     // wired callbacks (known up front, so a callback added on a later render is still
     // delivered), and the shallowEqual-guarded DATA-only update() flow.
     // onReady/onError are the ONLY hand-wired callbacks — they also drive the ready state.
-    const handle = useLiveHandle<ElementHandle>(rest, wiredCallbacks, nsHandle, (options, live, latest) => {
-      if (!nsHandle || typeof nsHandle.create !== 'function') return null;
-      return (nsHandle.create as (key: string, options: Record<string, unknown>) => ElementHandle)(key, {
-        ...options,
-        ...live,
-        onReady: () => {
-          setReady(true);
-          (latest.current.onReady as (() => void) | undefined)?.();
-        },
-        // a TERMINAL error settles the ready state too: the frame is showing its `.error()`
-        // face, and a `fallback` that keeps hiding the iframe would bury it forever.
-        onError: (e: { message: string; code?: string }) => {
-          setReady(true);
-          (latest.current.onError as ((e: { message: string; code?: string }) => void) | undefined)?.(e);
-        },
-      });
-    });
+    const handle = useLiveHandle<ElementHandle>(
+      rest,
+      wiredCallbacks,
+      nsHandle,
+      (options, live, latest) => {
+        if (!nsHandle || typeof nsHandle.create !== 'function') return null;
+        return (nsHandle.create as (key: string, options: Record<string, unknown>) => ElementHandle)(key, {
+          ...options,
+          ...live,
+          onReady: () => {
+            setReady(true);
+            (latest.current.onReady as (() => void) | undefined)?.();
+          },
+          // a TERMINAL error settles the ready state too: the frame is showing its `.error()`
+          // face, and a `fallback` that keeps hiding the iframe would bury it forever.
+          onError: (e: { message: string; code?: string }) => {
+            setReady(true);
+            (latest.current.onError as ((e: { message: string; code?: string }) => void) | undefined)?.(e);
+          },
+        });
+      },
+      undefined,
+      true,
+    );
 
     // mount the handle's container into our div; destroy on unmount / handle change. destroy() owns
     // the full teardown (iframe + the SDK-created container it appended), so an in-place handle

@@ -16,7 +16,7 @@ const SDK_URL = 'https://js.whop.cloud/elements/amber/elements.js';
 
 // the app's built locale set (default locale first), define-injected from the ratified config —
 // the runtime value behind the generated `WhopElementsLocale` union, for validating dynamic strings.
-const WHOP_ELEMENTS_LOCALES = ['en', 'es', 'zh', 'nl', 'pt', 'de', 'it', 'fr', 'ja', 'pl', 'tr'];
+const WHOP_ELEMENTS_LOCALES = ['en', 'es', 'zh', 'nl', 'pt', 'de', 'hu', 'it', 'fr', 'ja', 'pl', 'tr'];
 
 type WhopWindow = Window & { WhopElements?: unknown };
 type WhopScript = HTMLScriptElement & { __whopReady?: Promise<unknown> };

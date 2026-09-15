@@ -2,6 +2,10 @@ import { createNamespaceReact } from './_runtime/react/namespace.js';
 const __ns = createNamespaceReact(
   'payments',
   [
+    {
+      key: 'payments',
+      events: ['onPaymentSelected', 'onInvoiceRequested', 'onUserSelected', 'onRefundRequested', 'onSettingsRequested'],
+    },
     { key: 'payment', events: ['onChange', 'onAddressChange'] },
     { key: 'address', events: ['onChange'] },
     { key: 'card', events: ['onChange'] },
@@ -24,6 +28,7 @@ const __ns = createNamespaceReact(
 );
 export const Payments = __ns.HandleProvider;
 export const usePayments = __ns.useHandle;
+export const PaymentsElement = __ns.components['payments'];
 export const PaymentElement = __ns.components['payment'];
 export const AddressElement = __ns.components['address'];
 export const CardElement = __ns.components['card'];
