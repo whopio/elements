@@ -3,7 +3,6 @@ export { WHOP_ELEMENTS_LOCALES } from '@whop/elements';
 export {
   Payments,
   usePayments,
-  PaymentsElement,
   PaymentElement,
   AddressElement,
   CardElement,
@@ -56,3 +55,4 @@ export {
   CardTransactionsElement,
 } from './wallet.js';
 export { Websites, useWebsites, WebsitesElement, PixelSetupElement } from './websites.js';
+export { Dashboard, useDashboard, PaymentsTableElement, PaymentDetailElement } from './dashboard.js';

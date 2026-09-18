@@ -1,5 +1,33 @@
 # @whop/elements-react
 
+## 1.0.0-beta.5
+
+### Major Changes
+
+- element "payments" removed (`payments.payments`)
+
+### Minor Changes
+
+- d3fe447: Collect Splitit's required billing phone once, show missing-phone feedback, and submit the collected or caller-supplied number with the payment method.
+  
+  Use one simple phone input for Splitit and reuse a phone already collected by checkout. Add `fields.phone` to disable duplicate collection and `change.requiresBillingPhone` to expose the selected method’s requirement. ([#30471](https://github.com/whopio/whop-monorepo/pull/30471))
+- d3fe447: The checkout element now takes `buyerEmail` and `lockBuyerEmail` on embedded mounts too — pass the email your page already collected (`checkout.create("checkout", { buyerEmail })`, or `<CheckoutElement buyerEmail={…} />`) and the email row is seeded with it; add `lockBuyerEmail` to keep the buyer from editing it. Both were direct-mode props before, so a third-party page migrating from the legacy embedded checkout's `prefill.email` had no way to prefill the buyer's email. A session that already holds its buyer's email still wins over the prefill, exactly as on whop.com's own checkout page. ([#30471](https://github.com/whopio/whop-monorepo/pull/30471))
+- d3fe447: Checkout now accepts an `items` array so one checkout can sell multiple plans and quantities in a single payment. Multi-item checkouts show every server-priced item directly below the total, while the existing `plan` and `quantity` options continue to work as the single-item shorthand. ([#30471](https://github.com/whopio/whop-monorepo/pull/30471))
+- d3fe447: Added the `dashboard` namespace for an account's own records. Mount `PaymentsTableElement` for the account's payments and `PaymentDetailElement` for one payment under `Dashboard`, with one `accountId` and one scoped `accessToken` for both. `PaymentsElement` under `Payments` moved here as `PaymentsTableElement`, and the `Payments` handle no longer takes `accessToken`. ([#30471](https://github.com/whopio/whop-monorepo/pull/30471))
+- namespace "dashboard" added (`dashboard`)
+- prop analytics allowlist: accountId,layout,setupFutureUsage → accountId,layout (`payments.card.propAnalytics`)
+- prop analytics allowlist: affiliateCode,checkoutConfiguration,plan,promoCode,quantity → affiliateCode,checkoutConfiguration,items.plan,items.quantity,plan,promoCode,quantity (`checkout.controller.propAnalytics`)
+- prop "buyerEmail" added (`checkout.checkout.props.buyerEmail`)
+- prop "lockBuyerEmail" added (`checkout.checkout.props.lockBuyerEmail`)
+
+### Patch Changes
+
+- d3fe447: When a send is blocked because the account still needs identity verification, the send element now opens verification instead of showing a raw `whop.com/verify-identity` URL under Confirm. ([#30471](https://github.com/whopio/whop-monorepo/pull/30471))
+- d3fe447: Deposit elements now load bank and crypto fees from the account and show them beneath the selected funding method. ([#30471](https://github.com/whopio/whop-monorepo/pull/30471))
+- d3fe447: Google Pay is offered on merchants' own verified domains, beside Apple Pay. The express checkout and `paymentRequest` docs now state that both wallets need the page's domain verified as a payment method domain, and link the Google Pay API Terms of Service that offering Google Pay on your site accepts. ([#30471](https://github.com/whopio/whop-monorepo/pull/30471))
+- d3fe447: Send, Deposit, Withdraw, Capabilities, Payments, and Payment Details show static labels and controls immediately, with one consistent set of placeholders until their initial data is ready. ([#30471](https://github.com/whopio/whop-monorepo/pull/30471))
+- d3fe447: When a withdrawal is held for review because the account has an open information request, the activity detail drawer now shows that request with its button, instead of telling the payer nothing is needed from them. ([#30471](https://github.com/whopio/whop-monorepo/pull/30471))
+
 ## 1.0.0-beta.4
 
 ### Minor Changes
