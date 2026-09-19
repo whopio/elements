@@ -9,7 +9,7 @@
  */
 'use client';
 
-import { createContext, createElement, useContext, useMemo, type ReactNode } from 'react';
+import { createContext, createElement, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 // 16.8+ shim (not the 18+ react export) — this runs on the consumer's React; see namespace.tsx.
 import { useSyncExternalStore } from 'use-sync-external-store/shim';
 
@@ -132,9 +132,21 @@ export function WhopElements({
   toasts,
   baseUrl,
   skipPixel,
-}: { children: ReactNode; elements: ElementsProp } & GlobalConfig): ReactNode {
-  // new store per `elements` identity; resolves the (possibly async) constructor or its failure.
-  const store = useMemo(() => new LoaderStore(elements), [elements]);
+  onLoadError,
+}: {
+  children: ReactNode;
+  elements: ElementsProp;
+  /** Reported instead of thrown when the SDK fails to load: the tree stays mounted in the deferred
+   *  state (as with `elements={null}`). `retry()` starts a fresh load in place — the parent keeps
+   *  passing the same `elements`. */
+  onLoadError?: (error: Error, retry: () => void) => void;
+} & GlobalConfig): ReactNode {
+  // a retry swaps the load INSIDE the provider (the parent never re-renders or holds state); a new
+  // `elements` from the parent supersedes it.
+  const [retried, setRetried] = useState<{ of: ElementsProp; load: ElementsProp } | null>(null);
+  const current = retried && retried.of === elements ? retried.load : elements;
+  // new store per load identity; resolves the (possibly async) constructor or its failure.
+  const store = useMemo(() => new LoaderStore(current), [current]);
   const { ctor, error } = useSyncExternalStore(store.subscribe, store.getSnapshot, () => PENDING);
 
   // the root carries environment/baseUrl (load-time origin selection — "cannot change after
@@ -154,14 +166,42 @@ export function WhopElements({
   );
   const value = useMemo<RootContextValue>(() => ({ root, config }), [root, config]);
 
+  // any retry handed out acts on whatever is failed NOW (a held one from an earlier failure included)
+  // and does nothing while a load is in flight or has succeeded — a redundant retry must not swap
+  // the store, which would remount every element. The ref moves in the COMMIT phase: a render that
+  // never commits (a suspended transition to a new load) must not redirect the retry button the
+  // user can still see. Declared before the report effect so a fresh failure reads committed state.
+  const latest = useRef({ elements, current, store });
+  useEffect(() => {
+    latest.current = { elements, current, store };
+  });
+  const retry = () => {
+    const { elements: of, current: load, store: s } = latest.current;
+    if (!s.getSnapshot().error) return;
+    const own = (load as unknown as { retry?: unknown } | null)?.retry;
+    if (typeof own !== 'function') {
+      console.warn('whop elements: retry() needs the promise loadWhop() returns as `elements` — nothing to retry.');
+      return;
+    }
+    setRetried({ of, load: (own as () => ElementsProp).call(load) });
+  };
+
+  // keyed on the error alone: it fires once per failed load, through the callback of the render
+  // that committed the failure, and an inline arrow changing identity does not re-fire it.
+  useEffect(() => {
+    if (error) onLoadError?.(error, retry);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error]);
+
   // guards AFTER the hooks (so hook order is stable): a MISSING `elements` prop is a mistake (forgot
   // the loader) → throw; explicit `null` stays deferred (pending). A failed load surfaces to the
-  // nearest error boundary instead of hanging forever in "loading".
+  // nearest error boundary instead of hanging forever in "loading" — unless the consumer opted into
+  // `onLoadError`, in which case the tree stays mounted, deferred, until `retry()` or a new `elements`.
   if (elements === undefined)
     throw new Error(
       '<WhopElements> requires an `elements` prop — pass loadWhop() (or its resolved value); use `null` to defer.',
     );
-  if (error) throw error;
+  if (error && !onLoadError) throw error;
 
   return createElement(RootContext.Provider, { value }, children);
 }

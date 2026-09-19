@@ -29,7 +29,6 @@ export { Tracking, useTracking, PeopleElement, EventsElement, PersonElement } fr
 export {
   Wallet,
   useWallet,
-  RequiredActionsElement,
   ActionsElement,
   ActivityElement,
   ActivityDetailElement,
@@ -38,7 +37,6 @@ export {
   WithdrawElement,
   SendElement,
   CardDetailsElement,
-  VerificationElement,
   Balances,
   BalanceElement,
   BreakdownElement,
@@ -55,4 +53,11 @@ export {
   CardTransactionsElement,
 } from './wallet.js';
 export { Websites, useWebsites, WebsitesElement, PixelSetupElement } from './websites.js';
-export { Dashboard, useDashboard, PaymentsTableElement, PaymentDetailElement } from './dashboard.js';
+export {
+  Dashboard,
+  useDashboard,
+  RequiredActionsElement,
+  VerificationElement,
+  PaymentsTableElement,
+  PaymentDetailElement,
+} from './dashboard.js';

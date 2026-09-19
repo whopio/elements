@@ -1,5 +1,24 @@
 # @whop/elements-react
 
+## 1.0.0-beta.6
+
+### Major Changes
+
+- element "required-actions" removed (`wallet.required-actions`)
+- element "verification" removed (`wallet.verification`)
+
+### Minor Changes
+
+- 5d5e05f: `RequiredActionsElement` and `VerificationElement` moved from `Wallet` to `Dashboard`, beside the payments table and detail, and now read with the handle's `accountId` and `accessToken` instead of taking their own token. The required-action bar no longer opens the wallet's deposit overlay for Add money; it reports `depositRequested` so the host mounts its own deposit flow, such as the wallet `DepositElement`. ([#30533](https://github.com/whopio/whop-monorepo/pull/30533))
+- 5d5e05f: `loadWhop()` now loads the SDK from `cdn.whop.com`, and its failure message includes what the browser measured for the request. If your Content Security Policy lists script or frame sources, replace `js.whop.cloud` with `cdn.whop.com`. ([#30533](https://github.com/whopio/whop-monorepo/pull/30533))
+- 5d5e05f: `loadWhop()` no longer caches a failed load for the rest of the page. The promise it returns now carries `retry()`, which starts a fresh load after a failure. `<WhopElements>` gains `onLoadError(error, retry)`: with it set, a failed load is reported instead of thrown, your tree stays mounted, and calling `retry()` loads again in place. ([#30533](https://github.com/whopio/whop-monorepo/pull/30533))
+- element "required-actions" added (`dashboard.required-actions`)
+- element "verification" added (`dashboard.verification`)
+
+### Patch Changes
+
+- 5d5e05f: The wallet actions row stays readable on narrow screens: each action stacks its icon above its label instead of letting the labels run into the buttons beside them. ([#30533](https://github.com/whopio/whop-monorepo/pull/30533))
+
 ## 1.0.0-beta.5
 
 ### Major Changes

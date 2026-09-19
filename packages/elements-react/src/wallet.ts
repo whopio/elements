@@ -2,7 +2,6 @@ import { createNamespaceReact } from './_runtime/react/namespace.js';
 const __ns = createNamespaceReact(
   'wallet',
   [
-    { key: 'required-actions', events: ['onActionRequested', 'onIdentityVerificationRequested', 'onDepositRequested'] },
     {
       key: 'actions',
       events: [
@@ -57,7 +56,6 @@ const __ns = createNamespaceReact(
         'onMenuRequested',
       ],
     },
-    { key: 'verification', events: ['onVerificationRequested'] },
   ],
   [],
   [
@@ -97,7 +95,6 @@ const __ns = createNamespaceReact(
 );
 export const Wallet = __ns.HandleProvider;
 export const useWallet = __ns.useHandle;
-export const RequiredActionsElement = __ns.components['required-actions'];
 export const ActionsElement = __ns.components['actions'];
 export const ActivityElement = __ns.components['activity'];
 export const ActivityDetailElement = __ns.components['activityDetail'];
@@ -106,7 +103,6 @@ export const ConvertElement = __ns.components['convert'];
 export const WithdrawElement = __ns.components['withdraw'];
 export const SendElement = __ns.components['send'];
 export const CardDetailsElement = __ns.components['cardDetails'];
-export const VerificationElement = __ns.components['verification'];
 export const Balances = __ns.subs['balances'].Provider;
 export const BalanceElement = __ns.subs['balances'].components['balance'];
 export const BreakdownElement = __ns.subs['balances'].components['breakdown'];
