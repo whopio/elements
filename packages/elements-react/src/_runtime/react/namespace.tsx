@@ -317,8 +317,9 @@ function makeElementComponent(
             setReady(true);
             (latest.current.onReady as (() => void) | undefined)?.();
           },
-          // a TERMINAL error settles the ready state too: the frame is showing its `.error()`
-          // face, and a `fallback` that keeps hiding the iframe would bury it forever.
+          // an error settles the ready state too: the frame is showing its `.error()` face,
+          // and a `fallback` that keeps hiding the iframe would bury it forever (a retried
+          // boot's later `ready` keeps it settled).
           onError: (e: { message: string; code?: string }) => {
             setReady(true);
             (latest.current.onError as ((e: { message: string; code?: string }) => void) | undefined)?.(e);

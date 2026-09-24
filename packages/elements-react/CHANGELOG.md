@@ -1,5 +1,29 @@
 # @whop/elements-react
 
+## 1.1.0
+
+### Minor Changes
+
+- 1e0807c: Added `defaultValues.billingDetails` to the payment element to prefill the billing name, address, and phone. ([#31805](https://github.com/whopio/whop-monorepo/pull/31805))
+- 1e0807c: Added `defaultValues` to the checkout element to prefill the phone number, shipping address, and billing details.
+  
+  The address element and the payment element's billing details no longer prefill a street address under a different country when the prefilled country can't be used. Only the name is prefilled in that case. ([#31805](https://github.com/whopio/whop-monorepo/pull/31805))
+- 1e0807c: The address element can now be mounted once per `mode` under one Payments handle, so a checkout can collect a shipping address and a separate billing address. Billing details come from the billing element, or from the shipping element when no billing element is mounted. Each address element has its own autocomplete suggestions. An address element's `mode` is now set when you create it. Changing it on a live element is ignored with a console warning; destroy the element and create a new one instead. ([#31805](https://github.com/whopio/whop-monorepo/pull/31805))
+- 1e0807c: Track card-number copy requests in Whop Card analytics. ([#31805](https://github.com/whopio/whop-monorepo/pull/31805))
+- 1e0807c: The `Checkout` controller now fires `onComplete` once the purchase stands — before any `returnUrl` navigation — so an embedding page can record the purchase in its own analytics or ad pixels. The payload names what stands: `{ sessionId, result: 'payment', paymentId }` for a paid checkout, `{ result: 'waitlist_entry', entryId }` for a waitlist join, `{ result: 'setup', setupIntentId }` for a saved payment method. ([#31805](https://github.com/whopio/whop-monorepo/pull/31805))
+- prop "defaultValues" added (`payments.payment.props.defaultValues`)
+- cardinality one → one per "mode" (`payments.address.keyedBy`)
+- controller event "complete" added (`checkout.controller.events.complete`)
+- prop "defaultValues" added (`checkout.checkout.props.defaultValues`)
+- event "cardNumberCopyRequested" analytics allowlist added (accountId,cardId) (`wallet.cards.whopCard.eventAnalytics.cardNumberCopyRequested`)
+
+### Patch Changes
+
+- 1e0807c: The campaign creator and the ads reporting table now take and show budgets in the account's `ads_reporting_currency`, the same currency spend and results already report in. An account reporting in EUR enters €500 and reads €500 back on the campaign, the ad groups, and the inline budget editor; the API converts it to USD at the current exchange rate, which is what the budget is billed in. Nothing to configure on the element — set the account's `ads_reporting_currency` preference and budgets follow it. USD accounts see no change. ([#31805](https://github.com/whopio/whop-monorepo/pull/31805))
+- 1e0807c: Fixed opaque white backgrounds behind embedded elements on dark pages that declare a color-scheme meta tag. ([#31805](https://github.com/whopio/whop-monorepo/pull/31805))
+- 1e0807c: Fixed appearance styles dropping lab() and oklch() colors, including transparency, CSS variables, borders, and shadows. ([#31805](https://github.com/whopio/whop-monorepo/pull/31805))
+- 1e0807c: Fixed toasts raised inside embedded elements never appearing. ([#31805](https://github.com/whopio/whop-monorepo/pull/31805))
+
 ## 1.0.0
 
 ### Major Changes

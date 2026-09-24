@@ -5,7 +5,7 @@ const __ns = createNamespaceReact(
     { key: 'checkout', events: [] },
     { key: 'expressCheckout', events: [] },
   ],
-  [],
+  ['onComplete'],
   [],
 );
 export const Checkout = __ns.HandleProvider;
