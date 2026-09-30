@@ -57,7 +57,7 @@ const __ns = createNamespaceReact(
       ],
     },
   ],
-  [],
+  ['onIdentityVerificationRequested'],
   [
     {
       key: 'balances',
@@ -66,7 +66,7 @@ const __ns = createNamespaceReact(
         { key: 'balance', events: ['onRangeChanged', 'onRangeBrushed'] },
         { key: 'breakdown', events: ['onBreakdownSelected'] },
         { key: 'settlement', events: [] },
-        { key: 'list', events: ['onBalanceSelected', 'onAccountSelected'] },
+        { key: 'list', events: ['onBalanceSelected', 'onAccountSelected', 'onCreditsSelected'] },
       ],
     },
     {

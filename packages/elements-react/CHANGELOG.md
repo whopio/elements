@@ -1,5 +1,18 @@
 # @whop/elements-react
 
+## 1.2.0
+
+### Minor Changes
+
+- efef905: The balances list emits creditsSelected when the viewer selects the platform credits row. ([#32750](https://github.com/whopio/whop-monorepo/pull/32750))
+- efef905: Expose the Wallet onIdentityVerificationRequested callback so hosts can open their own settings or verification flow from deposit overlays. ([#32750](https://github.com/whopio/whop-monorepo/pull/32750))
+- controller event "identityVerificationRequested" added (`wallet.controller.events.identityVerificationRequested`)
+- event "creditsSelected" added (`wallet.balances.list.events.creditsSelected`)
+
+### Patch Changes
+
+- efef905: The payment detail breakdown now adds up: each purchased item, then the subtotal, promo discount and tax charged on top, then what the customer paid; below it, refunds, tax Whop remitted and fees down to the net amount. Tax included in the price is noted under the total instead of being listed as a charge. ([#32750](https://github.com/whopio/whop-monorepo/pull/32750))
+
 ## 1.1.0
 
 ### Minor Changes
