@@ -1,5 +1,23 @@
 # @whop/elements-react
 
+## 1.5.0
+
+### Minor Changes
+
+- a6450aa: `paymentRequest` sheets can offer a promo code field: set `requestPromoCode`, prefill a code with `appliedPromoCode` and `appliedPromoDescription`, and answer `onPromoCodeChange`: any answer without an `error` applies the code, with a new `amount` when it changes the total, and an `error` refuses it. If your handler throws, rejects, or doesn't answer within 10 seconds, the sheet refuses that code. Call `update({ amount, lineItems, shippingOptions })` to change what the sheet shows; while a sheet is open, `update()` throws, so answer the change events to change it. `canMakePayment({ types })` checks only the wallets you list, and its result includes each available wallet's official button art. ([#33780](https://github.com/whopio/whop-monorepo/pull/33780))
+- a6450aa: The `email` and `address` elements take `labelMode: "floating"`, in both address layouts. Each field shows its label as the placeholder until it has a value, then the text moves down and a small label fades in above it. `above` stays the default. ([#33780](https://github.com/whopio/whop-monorepo/pull/33780))
+- prop "labelMode" added (`payments.address.props.labelMode`)
+- prop "labelMode" added (`payments.email.props.labelMode`)
+- resource option "requestPromoCode" added (`payments.paymentRequest.options.requestPromoCode`)
+- resource option "appliedPromoCode" added (`payments.paymentRequest.options.appliedPromoCode`)
+- resource option "appliedPromoDescription" added (`payments.paymentRequest.options.appliedPromoDescription`)
+- resource method "update" added (`payments.paymentRequest.methods.update`)
+- resource event "promoCodeChange" added (`payments.paymentRequest.events.promoCodeChange`)
+- resource event failure answer "promoCodeChange" added (`payments.paymentRequest.replyFail.promoCodeChange`)
+- resource live option "amount" added (`payments.paymentRequest.liveOptions.amount`)
+- resource live option "lineItems" added (`payments.paymentRequest.liveOptions.lineItems`)
+- resource live option "shippingOptions" added (`payments.paymentRequest.liveOptions.shippingOptions`)
+
 ## 1.4.0
 
 ### Minor Changes
