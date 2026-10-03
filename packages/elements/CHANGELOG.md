@@ -1,5 +1,15 @@
 # @whop/elements
 
+## 1.7.0
+
+### Minor Changes
+
+- edad277: A payment request's `onPromoCodeChange` answer can now carry `lineItems` beside `amount`, so the Apple Pay and Google Pay sheets show the discount line and the tax it changes while they stay open. Before, a promo answer repriced only the total, and the sheet kept the line items it opened with. ([#33806](https://github.com/whopio/whop-monorepo/pull/33806))
+
+### Patch Changes
+
+- edad277: In the payment element's `separated` layout, the "More saved payment methods" and "N more payment methods" rows now carry `whop-PaymentMethodSeparated` like the methods around them, so `appearance.classes` styling for separated cards reaches them too. Before, they kept the default card surface and could not be restyled. ([#33806](https://github.com/whopio/whop-monorepo/pull/33806))
+
 ## 1.6.0
 
 ### Minor Changes
