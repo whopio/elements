@@ -27,7 +27,6 @@ import {
   useContext,
   useEffect,
   useImperativeHandle,
-  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
@@ -158,7 +157,7 @@ export function createNamespaceReact(
         root,
         (options, live) => (root ? root[namespace]!.create({ ...options, ...live }) : null),
         // an older hosted elements.js predates destroy() and carries only teardown().
-        (s) => (s.destroy ? s.destroy() : s.teardown?.()),
+        { destroy: (s) => (s.destroy ? s.destroy() : s.teardown?.()) },
       );
       useImperativeHandle(ref, () => ({ handle: nsHandle }), [nsHandle]);
 
@@ -257,9 +256,7 @@ function makeSubNamespace(
           ...live,
         });
       },
-      (s) => {
-        s.destroy();
-      },
+      { destroy: (s) => s.destroy() },
     );
     // the minted sub handle, reachable from React (1:1 vanilla parity: actions/update live
     // on it) — the same `{ handle }` ref shape HandleProvider exposes.
@@ -298,47 +295,49 @@ function makeElementComponent(
 
     const nsHandle = useHandle();
     const containerRef = useRef<HTMLDivElement>(null);
-    const [ready, setReady] = useState(false);
+    // ready belongs to ONE handle: a replaced handle (handle change, or replace-if-dead in
+    // useLiveHandle) starts unready, so a `fallback` covers the new frame until it boots.
+    const [readyHandle, setReadyHandle] = useState<ElementHandle | null>(null);
 
     // created once per handle; useLiveHandle owns the latest-ref, stable wrappers for the
     // wired callbacks (known up front, so a callback added on a later render is still
     // delivered), and the shallowEqual-guarded DATA-only update() flow.
     // onReady/onError are the ONLY hand-wired callbacks — they also drive the ready state.
+    // mount the handle's container into our div; destroy on unmount / handle change. destroy() owns
+    // the full teardown (iframe + the SDK-created container it appended), so an in-place handle
+    // change (new handle) can't orphan the old empty container div in the DOM.
     const handle = useLiveHandle<ElementHandle>(
       rest,
       wiredCallbacks,
       nsHandle,
       (options, live, latest) => {
         if (!nsHandle || typeof nsHandle.create !== 'function') return null;
-        return (nsHandle.create as (key: string, options: Record<string, unknown>) => ElementHandle)(key, {
+        const minted: ElementHandle = (
+          nsHandle.create as (key: string, options: Record<string, unknown>) => ElementHandle
+        )(key, {
           ...options,
           ...live,
           onReady: () => {
-            setReady(true);
+            setReadyHandle(minted);
             (latest.current.onReady as (() => void) | undefined)?.();
           },
           // an error settles the ready state too: the frame is showing its `.error()` face,
           // and a `fallback` that keeps hiding the iframe would bury it forever (a retried
           // boot's later `ready` keeps it settled).
           onError: (e: { message: string; code?: string }) => {
-            setReady(true);
+            setReadyHandle(minted);
             (latest.current.onError as ((e: { message: string; code?: string }) => void) | undefined)?.(e);
           },
         });
+        return minted;
       },
-      undefined,
+      {
+        attach: (mounted) => containerRef.current?.appendChild(mounted.container),
+        destroy: (mounted) => mounted.destroy(),
+      },
       true,
     );
-
-    // mount the handle's container into our div; destroy on unmount / handle change. destroy() owns
-    // the full teardown (iframe + the SDK-created container it appended), so an in-place handle
-    // change (new handle) can't orphan the old empty container div in the DOM.
-    useLayoutEffect(() => {
-      const el = containerRef.current;
-      if (!handle || !el) return;
-      el.appendChild(handle.container);
-      return () => handle.destroy();
-    }, [handle]);
+    const ready = handle !== null && readyHandle === handle;
 
     useImperativeHandle(ref, () => handle, [handle]);
 

@@ -1,5 +1,19 @@
 # @whop/elements
 
+## 1.6.0
+
+### Minor Changes
+
+- 39455b8: The `address` element takes `expanded: true` to show every address field from the start, instead of opening with the street address and revealing the rest after the buyer picks a suggestion or enters it manually. `false` stays the default. ([#33799](https://github.com/whopio/whop-monorepo/pull/33799))
+- 39455b8: The selected payment method's item now carries `whop-PaymentMethodSelected`, so `appearance.classes` can style the whole selected method, its row and its expanded fields together. Before, only the row (`whop-PaymentMethodRowSelected`) and its radio were marked. ([#33799](https://github.com/whopio/whop-monorepo/pull/33799))
+- 39455b8: The `address` element takes `layout: "wrap"`. It keeps the `full` layout's separate, labeled fields and also puts city, state and postal code side by side. Those and the pairs `full` already sets side by side (first and last name, organization) fit as many to a row as the element's width allows and wrap as it narrows. `full` stays the default. ([#33799](https://github.com/whopio/whop-monorepo/pull/33799))
+- prop "expanded" added (`payments.address.props.expanded`)
+
+### Patch Changes
+
+- 39455b8: When an Apple Pay or Google Pay sheet on a checkout can't recalculate the total for the buyer's card, the sheet now asks for another card instead of keeping the previous total. When the payment is priced in a different currency than the attached checkout session charges in, the wallet sheet doesn't open, and the confirm rejects with a `SESSION_CURRENCY_MISMATCH` error. ([#33799](https://github.com/whopio/whop-monorepo/pull/33799))
+- 39455b8: Elements and providers that React mounts, unmounts and mounts again now come back working. Under React StrictMode in development, an element added after the page loaded, such as a billing `<AddressElement>` shown when a "same as shipping" box is unticked, used to render an empty box, and inside a React 19 `<Activity>` an element or provider that was hidden and shown again stayed blank. They now load a fresh element instead. ([#33799](https://github.com/whopio/whop-monorepo/pull/33799))
+
 ## 1.5.0
 
 ### Minor Changes

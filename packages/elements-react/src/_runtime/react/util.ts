@@ -5,7 +5,7 @@
  */
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { EVENT_HANDLERS_PROP, HANDLER_PRESENT } from '../builder/event-handlers.js';
 import { isCallbackName } from '../builder/naming.js';
@@ -61,7 +61,8 @@ function liveCallbacks(
  * shallowEqual-guarded effect that pushes DATA-only updates (callbacks excluded — they
  * never force an update). `create` receives the current data options, the stable
  * wrappers for `callbackKeys`, and the `latest` ref (for wiring extra callbacks like
- * onReady/onError). An optional `destroy` runs on unmount / handle change.
+ * onReady/onError). An optional `lifecycle` tears the handle down on unmount / handle change
+ * and replaces it when an effect comes back to one it already destroyed (see below).
  */
 export function useLiveHandle<T extends { update(options: Record<string, unknown>): void }>(
   props: Record<string, unknown>,
@@ -72,7 +73,7 @@ export function useLiveHandle<T extends { update(options: Record<string, unknown
     live: Record<string, (...args: unknown[]) => void>,
     latest: { current: Record<string, unknown> },
   ) => T | null,
-  destroy?: (handle: T) => void,
+  lifecycle?: HandleLifecycle<T>,
   trackEventHandlers = false,
 ): T | null {
   const latest = useRef<Record<string, unknown>>(props);
@@ -82,11 +83,13 @@ export function useLiveHandle<T extends { update(options: Record<string, unknown
   // stay live via the stable wrappers (which read `latest`), so they never force update().
   // Ref-cached lazy init instead of useMemo: StrictMode double-invokes useMemo calculations,
   // which would create (and leak) a second live element — and trip the one-consumer-instance
-  // guard. The ref guard runs `create` exactly once per `dep`.
-  const cache = useRef<{ dep: unknown; handle: T | null } | null>(null);
-  if (cache.current === null || cache.current.dep !== dep) {
+  // guard. The ref guard runs `create` exactly once per `dep` and `generation`.
+  const [generation, setGeneration] = useState(0);
+  const cache = useRef<{ dep: unknown; generation: number; handle: T | null } | null>(null);
+  if (cache.current === null || cache.current.dep !== dep || cache.current.generation !== generation) {
     cache.current = {
       dep,
+      generation,
       handle: create(
         dataOptions(latest.current, trackEventHandlers ? callbackKeys : undefined),
         liveCallbacks(callbackKeys, latest),
@@ -95,18 +98,59 @@ export function useLiveHandle<T extends { update(options: Record<string, unknown
     };
   }
   const handle = cache.current.handle;
+  const destroyed = useRef<T | null>(null);
 
   const prev = useRef<Record<string, unknown> | null>(null);
   useEffect(() => {
-    if (!handle) return;
+    if (!handle || handle === destroyed.current) return;
     const options = dataOptions(latest.current, trackEventHandlers ? callbackKeys : undefined);
     if (prev.current && shallowEqual(prev.current, options)) return;
     prev.current = options;
     handle.update(options);
   });
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => (handle && destroy ? () => destroy(handle) : undefined), [handle]);
+  // REPLACE-IF-DEAD. The handle is minted in render, but its teardown runs in an effect cleanup,
+  // and React can run that cleanup and then the effect again on the SAME fiber: StrictMode's dev
+  // reconnect of a fresh mount, a shown `<Activity>`, Fast Refresh. The cleanup still destroys at
+  // once; when the effect comes back to a handle this hook destroyed, it bumps `generation`, and
+  // the next render mints a fresh one through the same ref-cached init. A provider's new handle
+  // reaches its children through context, so their elements take the ordinary handle-change path.
+  // The check is a LAYOUT effect even where the destroy is passive: layout effects reappear before
+  // passive ones, so an element and its provider both renew in one batched render (the provider
+  // renders first) instead of the element minting on a dead provider handle in between.
+  useLayoutEffect(() => {
+    if (!handle || !lifecycle) return;
+    if (handle === destroyed.current) {
+      setGeneration((n) => n + 1);
+      return;
+    }
+    if (!lifecycle.attach) return;
+    lifecycle.attach(handle);
+    return () => {
+      destroyed.current = handle;
+      lifecycle.destroy(handle);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handle]);
+  useEffect(() => {
+    if (!handle || !lifecycle || lifecycle.attach || handle === destroyed.current) return;
+    return () => {
+      destroyed.current = handle;
+      lifecycle.destroy(handle);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handle]);
 
   return handle;
 }
+
+/**
+ * How `useLiveHandle` tears its handle down. `destroy` runs synchronously in the effect cleanup:
+ * a PASSIVE cleanup by default (providers), or the LAYOUT cleanup when `attach` is given (an
+ * element appends its container in the layout effect and removes it in the same cleanup, so on a
+ * real unmount every element is destroyed before its provider).
+ */
+export type HandleLifecycle<T> = {
+  destroy: (handle: T) => void;
+  attach?: (handle: T) => void;
+};
