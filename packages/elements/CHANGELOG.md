@@ -1,5 +1,24 @@
 # @whop/elements
 
+## 1.8.0
+
+### Minor Changes
+
+- 2a5a62e: The payment element and the express checkout element take the same `wallets` object: set `applePay`, `googlePay`, or `payPal` to `'never'` and that element stops offering the wallet, and every key defaults to `'auto'`, which keeps today's behavior. A page that draws its own Apple Pay, Google Pay, or PayPal buttons with `paymentRequest` can now pass `wallets` to the payment element so buyers see each wallet once (`payPal: 'never'` removes the PayPal method). The express checkout element's array form (`wallets={['apple_pay', 'google_pay']}`) still works, but it is deprecated and will be removed in the next major version; the types and docs mark it. ([#33920](https://github.com/whopio/whop-monorepo/pull/33920))
+- 2a5a62e: A payment request's `onPromoCodeChange` answer can now carry `shippingOptions`, so a free-shipping code can change the shipping rates in the Apple Pay and Google Pay sheets while they stay open. The buyer's selected option stays selected while its `id` is still in the list. ([#33920](https://github.com/whopio/whop-monorepo/pull/33920))
+- prop "wallets" added (`payments.payment.props.wallets`)
+- element "address" no longer waits for required element "branding" (`payments.address.exempt.branding`)
+- element "email" no longer waits for required element "branding" (`payments.email.exempt.branding`)
+- element "taxId" no longer waits for required element "branding" (`payments.taxId.exempt.branding`)
+- the array member of prop "wallets" deprecated (`checkout.expressCheckout.props.wallets.deprecated.array`)
+- element "branding" became required — existing consumers must now mount it (`payments.branding.required`) — breaking, shipped without a major: the 1.0.0 docs already required the branding element; an earlier change loosened the runtime check by mistake
+
+### Patch Changes
+
+- 2a5a62e: The branding element is required on every payment form again: the other payments elements stay in their loading state until it is mounted, and `createConfirmationToken` refuses with `BRANDING_NOT_MOUNTED` without it.
+  
+  breaking-without-major: `payments.branding` — the 1.0.0 docs already required the branding element; an earlier change loosened the runtime check by mistake ([#33920](https://github.com/whopio/whop-monorepo/pull/33920))
+
 ## 1.7.0
 
 ### Minor Changes
