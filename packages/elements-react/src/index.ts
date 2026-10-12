@@ -21,6 +21,7 @@ export {
   useAds,
   BillingSetupElement,
   CampaignCreatorElement,
+  AdsAgreementElement,
   Reporting,
   ChartElement,
   TableElement,

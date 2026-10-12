@@ -4,6 +4,7 @@ const __ns = createNamespaceReact(
   [
     { key: 'billing-setup', events: [] },
     { key: 'campaign-creator', events: ['onExited', 'onLaunched'] },
+    { key: 'ads-agreement', events: ['onSigned'] },
   ],
   ['onBillingChanged'],
   [
@@ -32,6 +33,7 @@ export const Ads = __ns.HandleProvider;
 export const useAds = __ns.useHandle;
 export const BillingSetupElement = __ns.components['billing-setup'];
 export const CampaignCreatorElement = __ns.components['campaign-creator'];
+export const AdsAgreementElement = __ns.components['ads-agreement'];
 export const Reporting = __ns.subs['reporting'].Provider;
 export const ChartElement = __ns.subs['reporting'].components['chart'];
 export const TableElement = __ns.subs['reporting'].components['table'];

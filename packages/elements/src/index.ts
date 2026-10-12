@@ -124,6 +124,26 @@ const PAGE_REQUIREMENTS = {
       ],
     },
   },
+  bankConnections: {
+    production: {
+      sources: {
+        'frame-src': ['https://cdn.plaid.com'],
+        'script-src': ['https://cdn.plaid.com'],
+        'connect-src': ['https://production.plaid.com'],
+        'img-src': [],
+      },
+      hints: [],
+    },
+    sandbox: {
+      sources: {
+        'frame-src': ['https://cdn.plaid.com'],
+        'script-src': ['https://cdn.plaid.com'],
+        'connect-src': ['https://sandbox.plaid.com'],
+        'img-src': [],
+      },
+      hints: [],
+    },
+  },
 };
 
 const TAG = 'script[data-whop-elements]';
