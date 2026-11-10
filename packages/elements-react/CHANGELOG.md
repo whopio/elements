@@ -1,5 +1,64 @@
 # @whop/elements-react
 
+## 1.10.0
+
+### Minor Changes
+
+- `whop.checkout.checkoutSession.create({ accountId, lineItems, redirectUrl, paymentMethodOptions })` is a headless checkout session for a page that draws its own PayPal button. `load()` creates the session and returns its `requirements` and the `terms` to show next to your button: the seller's published policies, Whop's buyer terms and Whop's privacy policy. `show('paypal', { termsAccepted: true })`, called in the button's click handler with those terms shown, opens PayPal in a pop-up on desktop or sends the tab to PayPal on phones, and resolves with `{ payment }` once the buyer approves. It rejects with `attestation_required`, `requirements_unsupported`, `payment_request_cancelled`, `seller_pricing_unavailable` or `payment_failed`. After a redirect, the buyer lands on `redirectUrl` with `payment` and `status`. `email` is optional: without it, the payment and membership belong to the email of the PayPal account that approves. With `setupFutureUsage: 'off_session'`, PayPal asks the buyer to agree to future payments and Whop saves their PayPal account, so your server can charge it later without them, for example for a one-click upsell. With `paymentMethodOptions: { paypal: { requestShipping: true } }`, PayPal asks for a shipping address, an account's webhook subscribed to `shipping_address.changed` prices each one on the seller's server while the buyer is on PayPal, and the payment is created only after the buyer approves, at that price. Pass `metadata` (your own string keys and values) to keep them on the checkout session and the payment it creates, for example ad and affiliate attribution.
+- Add a delivery handle with a customer tracking element, mounted with the business `accountId` once customer tracking is turned on. Customers enter an order or tracking number and the email used at checkout to see delivery updates without signing in or requesting an email code. The element keeps customer inputs and results inside the Whop frame and uses the same native shipment history, business logo and saved branding/support settings as hosted tracking.
+  
+  Saved logo and business-name visibility apply independently to the hosted page and default embed, including the introductory text. Customers can open their email app or copy the saved support address from the Email support menu without displaying the address on the page. Keyboard focus does not scroll past the embedded header when loading or switching between tracking results and the lookup form.
+- The payment element gains `fields.address: 'minimal'`, which collects only each method's required billing details (for cards: name on card, country and postal code; a country for methods that declare none, plus the postal code on a taxed checkout) and wins over `billingDetails: 'full'`. Wallets, crypto, bank debits, bank transfers, card-present and in-app purchase collect no address under it. The checkout element sets it from the seller's checkout session, so a seller who collects only the minimum billing details gets that on every embedded and hosted checkout, including taxed ones.
+- The withdraw element now labels the instant amount as available instantly, shows how much of the daily instant limit is left when that limit is what caps the amount, and names the limit when an amount goes over it. An info tooltip explains why the amount can be lower than the balance. A host that supplies `limits` can pass `limits.instant.resetsAt` to show the same detail.
+- `contentSecurityPolicy()` and `preloadHints()` now include Braintree's client script, which PayPal loads on pages with a strict Content Security Policy.
+- Added the `chat` namespace: the `chat` element (a real-time message view), `channelList` (a list of the user's channels) and `search` (a modal for searching messages across channels).
+- The wallet activity and activity detail elements now include `security_answer` on a payout destination, so a payout that must be claimed with a security question shows the recipient's own answer instead of a fixed placeholder.
+- namespace "delivery" added (`delivery`)
+- namespace "chat" added (`chat`)
+- resource "checkoutSession" added (`checkout.checkoutSession`)
+- page requirement "script:https://assets.braintreegateway.com" added to group "wallets" — pages with a hardcoded Content Security Policy must allow it (`_pageRequirements.wallets.script:https://assets.braintreegateway.com`)
+
+### Patch Changes
+
+- The activity element now lists incoming crypto deposits, such as bitcoin sent to a deposit address, alongside the rest of the balance activity.
+- The compact wallet activity heading now shows a chevron and triggers `seeAllRequested` when clicked, just like See all activity.
+- The ads reporting table no longer has a Clicks column. Link clicks is shown by default instead, and selecting its count opens the people who landed on your page from the ad. A saved `columns` list that still includes `clicks` shows Link clicks in its place.
+- The ads reporting table no longer breaks rows down by age, gender, placement, location, device, or hour; every row shows whole figures. The `breakdown` prop is still accepted but has no effect, and `viewChanged` always reports `breakdown` as `null`.
+- Amounts in Albanian lek (ALL) are shown without decimals, the way Colombian pesos are.
+- Fixes to `BalanceElement` chart animations.
+- The payment element no longer asks buyers billed in Nigeria for a street address: it collects only the name, country and any other billing fields the payment method requires.
+- The campaign creator now has one set of settings for every campaign. It no longer shows placements, optimization goals, frequency caps, minimum daily spend, interest targeting, page identity, music, translations, or existing posts, and every campaign opens for editing. Creating an audience from the ad group uploads a customer list; audiences built from page and profile engagement are no longer offered. Saving changes only the settings you edited, so anything the creator doesn't show keeps its saved value.
+- The checkout element's `attribution` option takes `utm`, any other `utm_*` parameter keyed by its full name (`{ utm_funnel: 'spring' }`), and records it on the payment's acquisition data beside `utmSource` and the other named fields. Whop's hosted checkout links now keep every `utm_*` parameter they carry, up to 20 beyond the standard five, as legacy checkout did.
+- The checkout's pay, Try again, and Finish payment buttons now use the button color the seller chose in their checkout branding, with the matching text color, instead of always showing black or white.
+- The convert element now offers stock tokens, such as Tesla, Apple, and the S&P 500, beside Gold and Bitcoin. They are listed in their own Stocks section of the asset picker.
+- The country pickers in the withdraw and send elements no longer list countries Whop doesn't support due to sanctions, such as North Korea, Iran and Russia.
+- Improve business-logo labels for screen readers and keyboard focus on tracking results.
+- The activity type filter now lists only the activity types an account has in the selected period, ordered by volume within each group and showing each type's total.
+- Under `fields.address: 'minimal'`, a payment method whose provider requires the complete billing address (every buy-now-pay-later provider, the bank wires and Touch 'n Go) keeps the full address form on its own tile instead of being left out, while cards and the other methods still collect only their minimum.
+- Amounts in Indonesian rupiah (IDR) are shown without decimals, the way Colombian pesos are.
+- `KycElement` offers the IRS EIN letter upload when an EIN fails its IRS check, as the Verifications page does.
+- Elements now load the Whop pixel on pages that do not already run it, scoped to the account each element group works for (its `accountId`, or for a checkout, the seller of its plan), so your ad attribution works without a separate pixel install. A page that already runs the pixel keeps its own. `contentSecurityPolicy()` now includes `https://t.whop.tw` in production. Pass `skipPixel: true` to `WhopElements()` to turn this off.
+- Elements that are internal to the SDK, such as `addressSearch` and `phoneCodeModal`, can no longer be created by your code. They open only when their controller opens them, and calling `create` or `createOverlay` with one now throws an error.
+- The dashboard payment detail element now displays nonempty payment metadata above the payment ID, with selectable JSON, yellow strings, blue booleans/numbers/null, and Geist Mono text.
+- `PaymentElement` shows a payment method's field error once the buyer leaves the field, not on every keystroke, and names fields the way the payment method describes them.
+- PayPal express is now offered on payments in EUR and GBP, as well as USD.
+- Pix payments now show the copy-and-paste code under the QR, so buyers can pay from the same phone that shows it.
+- Collect a recipient address when adding a bank recipient, and show when the selected bank transfer method requires it.
+- Dates and times in the payments table, report activity, ads reporting table, people, person and events tracking, and delivery tracking elements now follow the viewer's locale, for example "1 hour ago" or "29. Oktober 2026 um 18:03". Payout arrival estimates also count days correctly when a daylight saving change falls on the current day.
+- Calling `select()` on the payment element with a method listed under "more payment methods" now opens the list and shows that method, so the payment can be confirmed. Before, confirming failed with a "beforeTokenize has no ACTIVE provider" error.
+- Max on the convert element now sells a token's whole balance. The swap is sized from the wallet's on-chain balance when it is created, so nothing is left behind.
+- Sending to a bank recipient through a currency conversion no longer fails with "Unable to quote the full recipient amount" when the exact amount can't be reached; the recipient receives the closest amount at or above what was entered.
+- The Send element now explains why an amount is above the available balance instead of only saying it exceeds it — calling out funds that are still settling, or funds held until identity verification is complete.
+- Send's recipient options now explain themselves on hover. The pay-a-user row reads "Send to a user or business", and its lookup field asks for an email, username, or business name.
+- Send now always opens the updated flow: suggested people and businesses when there are few saved recipients, and a single Add recipient screen that looks up a user, business, or email. The `canCreateBillPayRecipients` prop and `billPayRecipientCreateRequested` event are removed; adding a bank recipient is available wherever `canPayBillPayRecipients` is on.
+- The contact support link in `BalanceSettlement` now opens Whop support in a new tab instead of replacing the embedded element.
+- Returned withdrawal fees are marked as returned after a bank reversal.
+- Charts, reports and tracking elements now place days, weeks and months on the correct boundaries when a daylight saving change falls inside the selected range, and their times and chart labels follow the viewer's locale, for example "6:03 PM" or "18:03".
+- Balance details now list the last 30 days of money out of the balance (withdrawals, card spend, refunds, disputes, fees, and more, labelled as in the balance report) under the awaiting settlement totals and in the negative balance section, and show the money on your Whop Card or in your Whop wallet that counts toward available.
+- The checkout element no longer shows Apple Pay and Google Pay in its payment method list while its express buttons load and then moves them above the form. The list waits for the express buttons, and shows one of those wallets only when the express buttons don't offer it.
+- The payout method pickers in the withdraw and send elements now show a percentage fee as its terms, such as `4% + $2.50`, instead of a dollar estimate for an example amount.
+- The withdraw element no longer gets stuck on "Fee quote updating…" when the device clock runs fast. It times each payout quote by its remaining lifetime, calculated using the API's `server_time`, so a host that supplies `payoutQuote` should pass the API's `server_time` as `payoutQuote.serverTime`. A quote that arrives already expired now asks the payer to refresh it instead of requesting new quotes in a loop.
+
 ## 1.9.0
 
 ### Minor Changes

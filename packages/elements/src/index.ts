@@ -1,6 +1,6 @@
 /**
  * The published vanilla package's runtime: a tiny loader that pulls the (versioned) hosted SDK onto
- * the consumer page. This file is REAL source — typechecked here, then esbuild-bundled per format
+ * the consumer page. This file is REAL source — typechecked here, then bundled per format
  * (esm → index.js, cjs → index.cjs) with ORIGIN/SDK_URL define-injected at build time (same
  * technique as the boot shim). Never imported at runtime by this package.
  *
@@ -23,6 +23,8 @@ const WHOP_ELEMENTS_LOCALES = ['en', 'es', 'zh', 'nl', 'pt', 'de', 'hu', 'it', '
 // the embedding page reaches, grouped (the Apple Pay, Google Pay, and PayPal sheets, for example)
 // and resolved per environment.
 const API_ORIGINS = { production: 'https://api.whop.com', sandbox: 'https://sandbox-api.whop.com' };
+// The Whop pixel, which elements.js loads onto a production page that has none.
+const PIXEL_ORIGIN = 'https://t.whop.tw';
 const PAGE_REQUIREMENTS = {
   wallets: {
     production: {
@@ -32,6 +34,7 @@ const PAGE_REQUIREMENTS = {
           'https://pay.google.com',
           'https://applepay.cdn-apple.com',
           'https://js.braintreegateway.com',
+          'https://assets.braintreegateway.com',
           'https://www.paypal.com',
           'https://c.paypal.com',
         ],
@@ -61,12 +64,12 @@ const PAGE_REQUIREMENTS = {
           href: 'https://js.braintreegateway.com/web/3.146.0/js/paypal-checkout-v6.min.js',
           as: 'script',
         },
+        { rel: 'preload', href: 'https://assets.braintreegateway.com/web/3.146.0/js/client.min.js', as: 'script' },
         { rel: 'preload', href: 'https://www.paypal.com/web-sdk/v6/core', as: 'script' },
         { rel: 'preconnect', href: 'https://api.basistheory.com', crossOrigin: 'anonymous' },
         { rel: 'preconnect', href: 'https://payments.braintree-api.com', crossOrigin: 'anonymous' },
         { rel: 'preconnect', href: 'https://api.braintreegateway.com', crossOrigin: 'anonymous' },
         { rel: 'preconnect', href: 'https://checkout.paypal.com' },
-        { rel: 'preconnect', href: 'https://assets.braintreegateway.com' },
         { rel: 'preconnect', href: 'https://c.paypal.com' },
         { rel: 'preconnect', href: 'https://api-m.paypal.com', crossOrigin: 'anonymous' },
         { rel: 'preconnect', href: 'https://www.paypal.com', crossOrigin: 'anonymous' },
@@ -83,6 +86,7 @@ const PAGE_REQUIREMENTS = {
           'https://pay.google.com',
           'https://applepay.cdn-apple.com',
           'https://js.braintreegateway.com',
+          'https://assets.braintreegateway.com',
           'https://www.sandbox.paypal.com',
           'https://c.paypal.com',
         ],
@@ -112,12 +116,12 @@ const PAGE_REQUIREMENTS = {
           href: 'https://js.braintreegateway.com/web/3.146.0/js/paypal-checkout-v6.min.js',
           as: 'script',
         },
+        { rel: 'preload', href: 'https://assets.braintreegateway.com/web/3.146.0/js/client.min.js', as: 'script' },
         { rel: 'preload', href: 'https://www.sandbox.paypal.com/web-sdk/v6/core', as: 'script' },
         { rel: 'preconnect', href: 'https://api.basistheory.com', crossOrigin: 'anonymous' },
         { rel: 'preconnect', href: 'https://payments.sandbox.braintree-api.com', crossOrigin: 'anonymous' },
         { rel: 'preconnect', href: 'https://api.sandbox.braintreegateway.com', crossOrigin: 'anonymous' },
         { rel: 'preconnect', href: 'https://checkout.paypal.com' },
-        { rel: 'preconnect', href: 'https://assets.braintreegateway.com' },
         { rel: 'preconnect', href: 'https://c.paypal.com' },
         { rel: 'preconnect', href: 'https://api-m.sandbox.paypal.com', crossOrigin: 'anonymous' },
         { rel: 'preconnect', href: 'https://www.sandbox.paypal.com', crossOrigin: 'anonymous' },
@@ -577,17 +581,18 @@ class ContentSecurityPolicy {
   }
 }
 
-// The sources elements need: the hosted frames and SDK, the Whop API for the environment, and every
-// group's origins for that environment, including what the vendor scripts it loads reach, unless
-// its key is false.
+// The sources elements need: the hosted frames and SDK, the Whop API for the environment, the Whop
+// pixel in production, and every group's origins for that environment, including what the vendor
+// scripts it loads reach, unless its key is false.
 function contentSecurityPolicy(options: Record<string, unknown> = {}): ContentSecurityPolicy {
+  const environment = environmentOf(options.environment);
+  const pixel = environment === 'production' ? [PIXEL_ORIGIN] : [];
   const directives: Record<keyof Sources, string[]> = {
     'frame-src': [ORIGIN],
-    'script-src': [ORIGIN],
-    'connect-src': [apiOrigin(options.environment)],
+    'script-src': [ORIGIN, ...pixel],
+    'connect-src': [apiOrigin(options.environment), ...pixel],
     'img-src': [],
   };
-  const environment = environmentOf(options.environment);
   for (const [group, byEnvironment] of Object.entries(PAGE_REQUIREMENTS)) {
     if (options[group] === false) continue;
     for (const [name, list] of Object.entries(byEnvironment[environment].sources) as [keyof Sources, string[]][]) {

@@ -62,3 +62,5 @@ export {
   PaymentsTableElement,
   PaymentDetailElement,
 } from './dashboard.js';
+export { Delivery, useDelivery, TrackingElement } from './delivery.js';
+export { Chat, useChat, ChatElement, ChannelListElement, SearchElement } from './chat.js';

@@ -26,9 +26,9 @@ export interface GlobalConfig {
   toasts?: boolean;
   /** Override the origin serving the hosted element pages (local/staging). */
   baseUrl?: string;
-  /** Skip linking element analytics to the Whop pixel's visitor id on pages that run the
-   *  pixel — forwarded to the constructor. Usage analytics themselves are unaffected.
-   *  Load-time, like environment/baseUrl. @default false */
+  /** Skip the Whop pixel: elements neither load it onto a page that lacks one nor link element
+   *  analytics to its visitor id — forwarded to the constructor. Usage analytics themselves are
+   *  unaffected. Load-time, like environment/baseUrl. @default false */
   skipPixel?: boolean;
 }
 
